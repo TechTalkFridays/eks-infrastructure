@@ -1,0 +1,5 @@
+---
+ingressHost: morty.com
+version: v1.3.0
+redisVersion: 5.0.3-alpine
+dexVersion: v2.14.0

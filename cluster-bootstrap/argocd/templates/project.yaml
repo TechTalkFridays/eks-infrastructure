@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: shared-services
+  namespace: argocd
+spec:
+  description: Deployment of shared-services and kube-prometheus
+  sourceRepos:
+  - 'git@github.com:TechTalkFridays/eks-shared-services.git'
+  - 'git@github.com:TechTalkFridays/eks-kube-prometheus.git'
+  destinations:
+  - namespace: '*'
+    server: '*'
+  clusterResourceWhitelist:
+  - group: '*'
+    kind: '*'
