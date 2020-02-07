@@ -14,12 +14,12 @@ To redeploy argocd with updated configs run:
 helm upgrade argocd . -f helm_vars/morty/values.yaml
 ```
 
-Install core-services and prometheus app of apps. Then perform a first time sync.
+Install shared-service and kube-prometheus app of apps. Then perform a first time sync.
 ```bash
-kubectl apply -f app-of-apps/stratus-sandbox/
+kubectl apply -f app-of-apps/morty/
 argocd login argocd-stratus.pointclickcare.com --grpc-web
-argocd app sync stratus-sandbox-prometheus --grpc-web
-argocd app sync stratus-sandbox-core-services --grpc-web
+argocd app sync morty-kube-prometheus --grpc-web
+argocd app sync morty-shared-services --grpc-web
 ```
 
 Create a DNS record for the argo cd UI.
@@ -28,7 +28,7 @@ Create a DNS record for the argo cd UI.
 Registers a cluster's credentials to Argo CD, and is only necessary when deploying to an external cluster. When deploying internally (to the same cluster that Argo CD is running in), https://kubernetes.default.svc should be used as the application's K8s API server address.
 
 ```bash
-argocd cluster add stratus-sandbox
+argocd cluster add rick
 ```
 
 ## Adding new apps
