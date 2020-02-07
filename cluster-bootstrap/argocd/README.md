@@ -14,12 +14,9 @@ To redeploy argocd with updated configs run:
 helm upgrade argocd . -f helm_vars/morty/values.yaml
 ```
 
-Install shared-service and kube-prometheus app of apps. Then perform a first time sync.
+Install shared-service and kube-prometheus app of apps
 ```bash
 kubectl apply -f app-of-apps/morty/
-argocd login argocd-stratus.pointclickcare.com --grpc-web
-argocd app sync morty-kube-prometheus --grpc-web
-argocd app sync morty-shared-services --grpc-web
 ```
 
 Create a DNS record for the argo cd UI.
