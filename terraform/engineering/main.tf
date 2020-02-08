@@ -2,7 +2,7 @@ terraform {
   required_version = ">= 0.12.20"
   backend "s3" {
     bucket = "techtalkfridays-terraform-state"
-    key    = "production.tfstate"
+    key    = "engineering.tfstate"
     region = "us-east-1"
   }
 }

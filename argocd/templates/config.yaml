@@ -10,17 +10,6 @@ metadata:
 data:
   url: https://{{ .Values.ingressHost }}
   users.anonymous.enabled: "true"
-  repositories: |
-    - insecure: true
-      insecureIgnoreHostKey: true
-      name: eks-kube-prometheus
-      type: git
-      url: git@github.com:TechTalkFridays/eks-kube-prometheus.git
-    - insecure: true
-      insecureIgnoreHostKey: true
-      name: eks-shared-services
-      type: git
-      url: git@github.com:TechTalkFridays/eks-shared-services.git
   resource.customizations: |
     extensions/Ingress:
         health.lua: |

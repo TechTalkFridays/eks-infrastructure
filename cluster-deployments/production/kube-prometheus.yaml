@@ -1,19 +1,20 @@
+---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: morty-shared-services
+  name: kube-prometheus
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
-  project: shared-services
+  project: kube-prometheus
   source:
-    repoURL: git@github.com:TechTalkFridays/eks-shared-services.git
-    targetRevision: master
-    path: morty
+    repoURL: git@github.com:TechTalkFridays/eks-kube-prometheus.git
+    targetRevision: production
+    path: production
     helm:
       valueFiles:
-      - values.yaml
+      - production-values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
