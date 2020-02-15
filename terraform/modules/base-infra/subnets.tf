@@ -36,6 +36,7 @@ resource "aws_subnet" "worker_node_subnets" {
   tags = merge(var.common_tags, map(
     "Name", "eks-worker-node-subnet-${each.key}",
     "kubernetes.io/role/internal-elb", "1",
+    "kubernetes.io/cluster/${var.eks_cluster}", "shared"
     ))
 }
 
