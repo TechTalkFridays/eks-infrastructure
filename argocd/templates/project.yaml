@@ -7,7 +7,7 @@ metadata:
 spec:
   description: Deployment of shared-services 
   sourceRepos:
-  - 'git@github.com:TechTalkFridays/eks-shared-services.git'
+  - 'https://github.com/TechTalkFridays/eks-shared-services.git'
   destinations:
   - namespace: '*'
     server: '*'
@@ -23,7 +23,7 @@ metadata:
 spec:
   description: Deployment of kube-prometheus
   sourceRepos:
-  - 'git@github.com:TechTalkFridays/eks-kube-prometheus.git'
+  - 'https://github.com/TechTalkFridays/eks-kube-prometheus.git'
   destinations:
   - namespace: '*'
     server: '*'

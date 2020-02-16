@@ -9,12 +9,12 @@ metadata:
 spec:
   project: kube-prometheus
   source:
-    repoURL: git@github.com:TechTalkFridays/eks-kube-prometheus.git
+    repoURL: https://github.com/TechTalkFridays/eks-kube-prometheus.git
     targetRevision: master
     path: engineering
     helm:
       valueFiles:
-      - engineering-values.yaml
+      - values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd

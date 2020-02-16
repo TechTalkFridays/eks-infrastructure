@@ -9,12 +9,12 @@ metadata:
 spec:
   project: shared-services
   source:
-    repoURL: git@github.com:TechTalkFridays/eks-shared-services.git
+    repoURL: https://github.com/TechTalkFridays/eks-shared-services.git
     targetRevision: production
     path: production
     helm:
       valueFiles:
-      - production-values.yaml
+      - values.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
