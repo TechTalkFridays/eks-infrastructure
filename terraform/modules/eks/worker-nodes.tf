@@ -38,6 +38,9 @@ resource "aws_iam_role_policy_attachment" "AmazonEC2ContainerRegistryReadOnly" {
   role       = aws_iam_role.eks-workernode-sts.name
 }
 
+/*
+Convert managed node groups to manually provisioning ASGs. This will allow us to add target groups to worker node ASGs.
+*/
 resource "aws_eks_node_group" "worker_node" {
   for_each = var.eks_cluster_worker_nodes
 
@@ -45,6 +48,12 @@ resource "aws_eks_node_group" "worker_node" {
   node_role_arn   = aws_iam_role.eks-workernode-sts.arn
   node_group_name = each.value.name 
   subnet_ids      = each.value.subnet_ids 
+  instance_types  = each.value.instance_types
+  disk_size       = each.value.disk_size
+
+  remote_access {
+    ec2_ssh_key = var.ssh_key
+  }
 
   scaling_config {
     desired_size = each.value.desired_size 

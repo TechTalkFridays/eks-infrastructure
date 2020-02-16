@@ -6,17 +6,17 @@ Create a new directory of variables in helm_vars
 
 Now we can run the installation.
 ```bash
-helm install argocd . -f helm_vars/morty/values.yaml
+helm install argocd . -f helm_vars/engineering/values.yaml
 ```
 
 To redeploy argocd with updated configs run:
 ```bash
-helm upgrade argocd . -f helm_vars/morty/values.yaml
+helm upgrade argocd . -f helm_vars/engineering/values.yaml
 ```
 
 Install shared-service and kube-prometheus app of apps
 ```bash
-kubectl apply -f app-of-apps/morty/
+kubectl apply -f app-of-apps/engineering/
 ```
 
 Create a DNS record for the argo cd UI.

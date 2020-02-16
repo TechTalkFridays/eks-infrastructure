@@ -3,7 +3,8 @@ resource "aws_route_table" "worker_node_route" {
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_nat_gateway.worker_node_nat_gateway.id
+    // nat_gateway_id = aws_nat_gateway.worker_node_nat_gateway.id
+    gateway_id = aws_internet_gateway.main.id
   }
 
   tags = merge(var.common_tags, map(

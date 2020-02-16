@@ -17,3 +17,9 @@ terraform init
 terraform plan
 terraform apply
 ```
+
+Download your cluster kubeconfig after
+```bash
+aws eks --region us-east-1 update-kubeconfig --name engineering
+kubectl cluster-info
+```

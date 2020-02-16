@@ -9,6 +9,12 @@ variable "vpc_id" {
     type        = string
 }
 
+variable "eks_version" {
+    description = "Version of the EKS cluster"
+    type        = string
+    default     = "1.14"
+}
+
 variable "common_tags" {
     description = "Map of tags to include for tagging all resources"
     type        = map
@@ -16,6 +22,11 @@ variable "common_tags" {
         Environment = "Engineering"
         Owner       = "Devops"
     }
+}
+
+variable "ssh_key" {
+    description = "Name of ec2 ssh key"
+    type        = string
 }
 
 variable "eks_cluster_subnet_ids" {
@@ -26,11 +37,4 @@ variable "eks_cluster_subnet_ids" {
 variable "eks_cluster_worker_nodes" {
     description = "List of maps containing worker node configuration"
     type        = map
-    /*default = [{
-        name = "default"
-        subnet_ids = []
-        desired_size = 1
-        max_size = 1
-        min_size = 1
-    }]*/
 }
