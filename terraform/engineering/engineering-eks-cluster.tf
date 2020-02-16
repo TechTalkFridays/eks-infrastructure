@@ -10,9 +10,9 @@ module "engineering-eks-cluster" {
         default = {
             name = "default"
             subnet_ids = module.engineering-base-infra.worker_node_subnets
-            desired_size = 1
-            max_size = 1
-            min_size = 1
+            desired_size = 3
+            max_size = 5
+            min_size = 3
             instance_types = ["t3.medium"]
             disk_size = "20"
         }

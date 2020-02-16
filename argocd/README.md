@@ -14,11 +14,6 @@ To redeploy argocd with updated configs run:
 helm upgrade argocd . -f helm_vars/engineering/values.yaml
 ```
 
-Install shared-service and kube-prometheus app of apps
-```bash
-kubectl apply -f app-of-apps/engineering/
-```
-
 Create a DNS record for the argo cd UI.
 
 ## Adding new clusters

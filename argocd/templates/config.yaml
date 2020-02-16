@@ -158,3 +158,13 @@ metadata:
     app.kubernetes.io/part-of: argocd
   name: argocd-tls-certs-cm
   namespace: argocd
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: argocd-secret
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-secret
+    app.kubernetes.io/part-of: argocd
+type: Opaque
