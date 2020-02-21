@@ -168,3 +168,6 @@ metadata:
     app.kubernetes.io/name: argocd-secret
     app.kubernetes.io/part-of: argocd
 type: Opaque
+data:
+  admin.password: {{ .Values.adminPassword | b64enc }}
+  admin.passwordMtime: {{.Values.adminPasswordMTime | b64enc }}
