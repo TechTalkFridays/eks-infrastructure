@@ -30,14 +30,7 @@ resource "aws_iam_policy" "kuberentes-external-secrets" {
 POLICY
 }
 
-resource "aws_iam_role" "kuberentes-external-secrets" {
-  name = "kuberentes-external-secrets-${var.cluster_name}"
-  assume_role_policy =  templatefile("${path.module}/oidc_assume_role_policy.json", { OIDC_ARN = aws_iam_openid_connect_provider.main.arn, OIDC_URL = replace(aws_iam_openid_connect_provider.main.url, "https://", ""), NAMESPACE = "shared-services", SA_NAME = "kubernetes-external-secrets" })
-  depends_on = [aws_iam_openid_connect_provider.main]
-}
-
-
-resource "aws_iam_role_policy_attachment" "aws_node" {
-  role       = aws_iam_role.kuberentes-external-secrets.name
+resource "aws_iam_role_policy_attachment" "kuberentes-external-secrets" {
   policy_arn = aws_iam_policy.kuberentes-external-secrets.arn
+  role       = aws_iam_role.eks-workernode-sts.name
 }
