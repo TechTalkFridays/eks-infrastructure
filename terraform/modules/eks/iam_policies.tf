@@ -30,7 +30,35 @@ resource "aws_iam_policy" "kuberentes-external-secrets" {
 POLICY
 }
 
+resource "aws_iam_policy" "node-autoscaler" {
+  name        = "node-autoscaler"
+  policy = <<POLICY
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "autoscaling:DescribeAutoScalingGroups",
+                "autoscaling:DescribeAutoScalingInstances",
+                "autoscaling:DescribeLaunchConfigurations",
+                "autoscaling:DescribeTags",
+                "autoscaling:SetDesiredCapacity",
+                "autoscaling:TerminateInstanceInAutoScalingGroup"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+POLICY
+}
+
 resource "aws_iam_role_policy_attachment" "kuberentes-external-secrets" {
   policy_arn = aws_iam_policy.kuberentes-external-secrets.arn
+  role       = aws_iam_role.eks-workernode-sts.name
+}
+
+resource "aws_iam_role_policy_attachment" "node-autoscaler" {
+  policy_arn = aws_iam_policy.node-autoscaler.arn
   role       = aws_iam_role.eks-workernode-sts.name
 }
