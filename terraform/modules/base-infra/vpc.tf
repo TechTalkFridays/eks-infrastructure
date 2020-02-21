@@ -4,6 +4,7 @@ resource "aws_vpc" "main" {
   enable_dns_hostnames = true
   tags       = merge(var.common_tags, map(
     "Name", "${var.name}",
+    "kubernetes.io/cluster/${var.eks_cluster}", "shared",
     ))
 }
 

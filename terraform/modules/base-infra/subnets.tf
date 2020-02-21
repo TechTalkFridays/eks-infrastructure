@@ -58,6 +58,7 @@ resource "aws_subnet" "eks_cluster_subnets" {
 
   tags = merge(var.common_tags, map(
     "Name", "eks-cluster-subnet-${each.key}",
+    "kubernetes.io/cluster/${var.eks_cluster}", "shared"
     ))
 }
 
