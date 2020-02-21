@@ -17,5 +17,4 @@ module "engineering-eks-cluster" {
             disk_size = "20"
         }
     }
-    
 }

@@ -10,6 +10,6 @@ output "worker_node_subnets" {
     value = [aws_subnet.worker_node_subnets["us-east-1a"].id, aws_subnet.worker_node_subnets["us-east-1b"].id, aws_subnet.worker_node_subnets["us-east-1c"].id]
 }
 
-output "alb_subnets" {
+/*output "alb_subnets" {
     value = [aws_subnet.alb_subnets["us-east-1a"].id, aws_subnet.alb_subnets["us-east-1b"].id, aws_subnet.alb_subnets["us-east-1c"].id]
-}
+}*/
