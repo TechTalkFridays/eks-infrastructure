@@ -158,3 +158,12 @@ def make():
         }
         for gateway, targets in targets.items()
     }
+
+    # Return infrastructure.
+    return {
+        'vpc': vpc,
+        'subnets': subnets,
+        'eip': eip,
+        'gateways': gateways,
+        'routes': routes,
+    }
