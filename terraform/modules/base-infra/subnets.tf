@@ -13,7 +13,7 @@ resource "aws_route_table" "worker_node_route" {
 
 }
 
-resource "aws_route_table" "public_rote" {
+resource "aws_route_table" "public_route" {
   vpc_id = aws_vpc.main.id
 
   route {

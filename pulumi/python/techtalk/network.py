@@ -1,29 +1,58 @@
 from pulumi_aws import ec2
 
 TAGS = {
-    "Environment": "Engineering",
-    "Owner": "Devops",
+    'Environment': 'Engineering',
+    'Owner': 'Devops',
 }
 
 SUBNETS = {
-    "us-east-1a": "10.0.0.0/20",
-    "us-east-1b": "10.0.16.0/20",
-    "us-east-1c": "10.0.32.0/20",
+    'worker': {
+        'tags': {
+            'kubernetes.io/role/internal-elb': '1',
+            'kubernetes.io/cluster/engineering': 'shared',
+        },
+        'zones': {
+            'us-east-1a': '10.0.0.0/20',
+            'us-east-1b': '10.0.16.0/20',
+            'us-east-1c': '10.0.32.0/20',
+        },
+    },
+    'eks': {
+        'tags': {
+            'kubernetes.io/role/internal-elb': '1',
+            'kubernetes.io/cluster/engineering': 'shared',
+        },
+        'zones': {
+            'us-east-1a': '10.0.0.0/20',
+            'us-east-1b': '10.0.16.0/20',
+            'us-east-1c': '10.0.32.0/20',
+        },
+    },
+    'alb': {
+        'tags': {
+            'kubernetes.io/role/elb': '1',
+        },
+        'zones': {
+            'us-east-1a': '10.1.3.0/24',
+            'us-east-1b': '10.1.4.0/24',
+            'us-east-1c': '10.1.5.0/24',
+        },
+    }
 }
 
 
-def subnet(vpc, zone, cidr):
-    """
-    Make and return a subnet from a zone and a cidr.
-    """
+def make_subnet(vpc, name, subnet, zone, cidr):
+    '''
+    Make a subnet.
+    '''
+    name = f'{name}-subnet-{zone}'
     tags = {
-        "Name": f"eks-worker-node-subnet-{zone}",
-        "kubernetes.io/role/internal-elb": "1",
-        "kubernetes.io/cluster/engineering": "shared",
+        'Name': name,
+        **subnet['tags'],
         **TAGS,
     }
     return ec2.Subnet(
-        f"worker_node_subnet_{zone}",
+        name,
         availability_zone=zone,
         cidr_block=cidr,
         vpc_id=vpc.id,
@@ -32,68 +61,100 @@ def subnet(vpc, zone, cidr):
     )
 
 
-def association(name, zone, subnet, table):
-    """
-    Make a routing association.
-    """
-    ec2.RouteTableAssociation(
-        f"{name}_{zone}", subnet_id=subnet.id, route_table_id=table.id,
+def make_gateways(vpc, eip, subnets):
+    '''
+    Make all gateways.
+    '''
+    # Make a nat gateway for worker nodes.
+    tags = {'Name': 'worker', **TAGS}
+    worker = ec2.NatGateway(
+        'worker',
+        allocation_id=eip.allocation_id,
+        subnet_id=subnets['alb']['us-east-1a'].id,
+        tags=tags,
+    )
+
+    # Make internet gateway.
+    tags = {'Name': 'public', **TAGS}
+    public = ec2.InternetGateway('public', vpc_id=vpc.id, tags=tags)
+
+    return {
+        'worker': worker,
+        'public': public,
+    }
+
+
+def make_association(name, zone, subnet, table):
+    '''
+    Associate a subnet with a route.
+    '''
+    return ec2.RouteTableAssociation(
+        f'{name}-{zone}', subnet_id=subnet.id, route_table_id=table.id,
     )
 
 
+def make_route(vpc, name, subnet, gateway):
+    '''
+    Make a route.
+    '''
+    # Make the route.
+    route_name = f'{name}-{gateway._name}-route'
+    tags = {'Name': route_name, **TAGS}
+    routes = [{'cidr_block': '0.0.0.0/0', 'gateway_id': gateway.id}]
+    table = ec2.RouteTable(
+        route_name, vpc_id=vpc.id, routes=routes, tags=tags,
+    )
+
+    # Make the associations:
+    associations = {
+        make_association(route_name, zone, value, table)
+        for zone, value in subnet.items()
+    }
+
+
 def make():
-    """
+    '''
     Make the network infrastructure.
-    """
+    '''
     # Make vpc.
     tags = {
-        "Name": "engineering",
-        "kubernetes.io/cluster/engineering": "shared",
+        'Name': 'engineering',
+        'kubernetes.io/cluster/engineering': 'shared',
         **TAGS,
     }
     vpc = ec2.Vpc(
-        "main",
-        cidr_block="10.0.0.0/16",
+        'main',
+        cidr_block='10.0.0.0/16',
         enable_dns_support=True,
         enable_dns_hostnames=True,
         tags=tags,
     )
 
-    # Make egress IP.
-    tags = {"Name": "Worker Node Egress IP", **TAGS}
-    eip = ec2.Eip("nat_gateway", vpc=True, tags=tags)
-
-    # Make internet gateway.
-    tags = {"Name": "Internet gateway", **TAGS}
-    gateway = ec2.InternetGateway("main", vpc_id=vpc.id, tags=tags)
-
     # Make subnets.
-    targets = SUBNETS.items()
-    subnets = {zone: subnet(vpc, zone, cidr) for zone, cidr in targets}
+    subnets = {
+        name: {
+            zone: make_subnet(vpc, name, subnet, zone, cidr)
+            for zone, cidr in subnet['zones'].items()
+        }
+        for name, subnet in SUBNETS.items()
+    }
 
-    # Make a nat gateway for worker nodes.
-    tags = {"Name": "Worker Node Nat Gateway", **TAGS}
-    ec2.NatGateway(
-        "worker_node_nat_gateway",
-        allocation_id=eip.allocation_id,
-        subnet_id=subnets["us-east-1a"].id,
-        tags=tags,
-    )
+    # Make egress IP.
+    tags = {'Name': 'worker-egress-ip', **TAGS}
+    eip = ec2.Eip('nat-eip', vpc=True, tags=tags)
 
-    # Make public route.
-    tags = {"Name": "Public Rote", **TAGS}
-    routes = [{"cidr_block": "0.0.0.0/0", "gateway_id": gateway.id}]
-    ec2.RouteTable(
-        "public_rote", vpc_id=vpc.id, routes=routes, tags=tags,
-    )
+    # Make gateways.
+    gateways = make_gateways(vpc, eip, subnets)
 
-    # Make worker route.
-    tags = {"Name": "Worker Node Route", **TAGS}
-    routes = [{"cidr_block": "0.0.0.0/0", "gateway_id": gateway.id}]
-    table = ec2.RouteTable(
-        "worker_node_route", vpc_id=vpc.id, routes=routes, tags=tags,
-    )
-
-    # Make route associations.
-    for zone, subnet in subnets:
-        association("worker_node_subnets", zone, subnet, table)
+    # Make routes.
+    targets = {
+        'worker': ['worker', 'eks', 'alb'],
+        'public': [],
+    }
+    routes = {
+        gateway: {
+            name: make_route(vpc, name, subnets[name], gateways[gateway])
+            for name in targets
+        }
+        for gateway, targets in targets.items()
+    }
